@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Forge Dashboard</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #b056e7;
+        --bg-gradient: linear-gradient(
+          135deg,
+          #cff8fc 0%,
+          #e5ebf8 50%,
+          #f3e6fd 100%
+        );
+        --card-bg: #fff;
+        --text-color: #333;
+        --sidebar-bg: rgba(255, 255, 255, 0.6);
+        --sidebar-active: rgba(235, 220, 252, 0.7);
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg-gradient);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 250px;
+        background: var(--sidebar-bg);
+        padding: 1.5rem;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        backdrop-filter: blur(10px);
+      }
+
+      .logo-area {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .logo-icon {
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-right: 0.5rem;
+      }
+
+      .logo-text {
+        font-weight: bold;
+        font-size: 1.5rem;
+      }
+
+      .logo-text .colored {
+        color: var(--primary-color);
+      }
+
+      .logo-text .white {
+        color: #fff;
+      }
+
+      .nav-menu {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.7rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+
+      .nav-item:hover {
+        background-color: var(--sidebar-active);
+        color: var(--primary-color);
+      }
+
+      .nav-item.active {
+        background-color: var(--sidebar-active);
+        color: var(--primary-color);
+      }
+
+      .nav-item i,
+      .nav-item svg {
+        width: 20px;
+        margin-right: 10px;
+        text-align: center;
+      }
+
+      .bottom-nav {
+        margin-top: auto;
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        margin-left: 250px;
+        padding: 2rem;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .welcome h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
+      }
+
+      .welcome p {
+        color: #666;
+      }
+
+      .search-profile {
+        display: flex;
+        align-items: center;
+      }
+
+      .search-container {
+        position: relative;
+        margin-right: 1rem;
+      }
+
+      .search-container input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border-radius: 50px;
+        border: none;
+        background-color: #fff;
+        width: 250px;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+      }
+
+      .profile-area {
+        display: flex;
+        align-items: center;
+      }
+
+      .notification {
+        margin-right: 1rem;
+        color: var(--primary-color);
+        position: relative;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+
+      .card-header {
+        background: transparent;
+        border-bottom: none;
+        padding: 1.2rem 1.5rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .card-header h5 {
+        margin-bottom: 0;
+        font-weight: 600;
+      }
+
+      .card-header .icon {
+        margin-right: 0.8rem;
+        color: var(--primary-color);
+      }
+
+      .card-header .see-all {
+        margin-left: auto;
+        color: #777;
+        font-size: 0.9rem;
+      }
+
+      /* Recent Tests */
+      .test-cards {
+        display: flex;
+        gap: 1rem;
+        padding: 0 1.5rem 1.5rem;
+      }
+
+      .test-card {
+        flex: 1;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .test-card-img {
+        height: 140px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+
+      .c-code-bg {
+        background-color: #1a1a2e;
+      }
+
+      .python-code-bg {
+        background-color: #1a1a2e;
+      }
+
+      .test-card-content {
+        padding: 1rem;
+      }
+
+      .test-title {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+
+      .test-subtitle {
+        color: #777;
+        font-size: 0.9rem;
+      }
+
+      .score-badge {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: #4caf50;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+      }
+
+      /* Quiz Competition */
+      .quiz-card {
+        text-align: center;
+        padding: 1.5rem;
+      }
+
+      .calendar-icon {
+        font-size: 3.5rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .calendar-date {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .calendar-year {
+        color: #777;
+        margin-bottom: 1.5rem;
+      }
+
+      .register-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .register-btn:hover {
+        background: #9c3fd7;
+        transform: translateY(-2px);
+      }
+
+      /* Leaderboard */
+      .leaderboard-card {
+        padding: 1rem 0;
+      }
+
+      .leaderboard-item {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+      }
+
+      .rank-badge {
+        width: 40px;
+        height: 40px;
+        margin-right: 0.8rem;
+      }
+
+      .rank-1 {
+        color: #ffd700;
+      }
+
+      .rank-2 {
+        color: #c0c0c0;
+      }
+
+      .rank-3 {
+        color: #cd7f32;
+      }
+
+      .leaderboard-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 1rem;
+      }
+
+      .leaderboard-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .leaderboard-info {
+        flex: 1;
+      }
+
+      .leaderboard-name {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+      }
+
+      .leaderboard-level {
+        color: #777;
+        font-size: 0.85rem;
+      }
+
+      /* Stats Cards */
+      .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        background-color: white;
+      }
+
+      .stat-card {
+        padding: 1.2rem;
+        display: grid;
+        align-items: center;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        background-color: white;
+      }
+
+      .stat-icon {
+        margin-right: 1rem;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+      }
+
+      .stat-info h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
+      }
+
+      .stat-label {
+        color: #777;
+        font-size: 0.85rem;
+      }
+
+      .passed {
+        color: #4caf50;
+      }
+
+      .failed {
+        color: #f44336;
+      }
+
+      .waiting {
+        color: #2196f3;
+      }
+      .stats-card-1{
+      background-color: white; padding: 1rem 0; 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-radius: 18px; width: 300px;
+        align-items: center;
+      }
+      /* Responsive */
+      @media (max-width: 992px) {
+        .sidebar {
+          width: 80px;
+          padding: 1rem 0.5rem;
+        }
+
+        .logo-text,
+        .nav-text {
+          display: none;
+        }
+
+        .nav-item {
+          justify-content: center;
+          padding: 0.7rem;
+        }
+
+        .nav-item i,
+        .nav-item svg {
+          margin-right: 0;
+        }
+
+        .main-content {
+          margin-left: 80px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .test-cards {
+          flex-direction: column;
+        }
+
+        .stats-cards {
+          grid-template-columns: 1fr;
+        }
+
+
+        .search-container input {
+          width: 180px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="logo-area">
+          <div class="logo-icon">
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="colored">Code</span>
+            <span class="white">Forge</span>
+          </div>
+        </div>
+
+        <div class="nav-menu">
+          <a href="#" class="nav-item active">
+            <i class="fa-solid fa-chart-simple"></i>
+            <span class="nav-text">Dashboard</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <i class="fa-solid fa-file-code"></i>
+            <span class="nav-text">Tests</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span class="nav-text">Profile</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <i class="fa-solid fa-trophy"></i>
+            <span class="nav-text">Leaderboard</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <i class="fa-solid fa-moon"></i>
+            <span class="nav-text">Dark mode</span>
+          </a>
+        </div>
+
+        <div class="bottom-nav">
+          <a href="#" class="nav-item">
+            <i class="fa-solid fa-gear"></i>
+            <span class="nav-text">Settings</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="nav-text">Log Out</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+          <div class="welcome">
+            <h1>Welcome John!</h1>
+            <p>USN: </p>
+          </div>
+
+          <div class="search-profile">
+            <div class="search-container">
+              <span class="search-icon">
+                <i class="fa-solid fa-search"></i>
+              </span>
+              <input type="text" class="form-control" placeholder="Search" />
+            </div>
+
+            <div class="profile-area">
+              <div class="notification">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+
+              <div class="user-avatar">
+                <img src="/api/placeholder/40/40" alt="Profile" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="row">
+          <!-- Left Column -->
+          <div class="col-lg-8">
+            <!-- Recent Tests -->
+            <div class="card">
+              <div class="card-header">
+                <div class="icon">
+                  <i class="fa-regular fa-file-lines"></i>
+                </div>
+                <h5>Recent Tests</h5>
+                <div class="see-all">
+                  <i class="fa-solid fa-angle-right"></i>
+                </div>
+              </div>
+
+              <div class="test-cards">
+                <div class="test-card">
+                  <div class="test-card-img c-code-bg">
+                    <img
+                      src="/api/placeholder/400/140"
+                      alt="C Programming"
+                      style="
+                        opacity: 0.7;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                      "
+                    />
+                  </div>
+                  <div class="test-card-content">
+                    <div class="test-title">C Programming</div>
+                    <div class="test-subtitle">Resume</div>
+                    <div class="score-badge">92%</div>
+                  </div>
+                </div>
+
+                <div class="test-card">
+                  <div class="test-card-img python-code-bg">
+                    <img
+                      src="/api/placeholder/400/140"
+                      alt="Python Programming"
+                      style="
+                        opacity: 0.7;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                      "
+                    />
+                  </div>
+                  <div class="test-card-content">
+                    <div class="test-title">Python Programming</div>
+                    <div class="test-subtitle">Resume</div>
+                    <div class="score-badge">88%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quiz Competition -->
+            <div class="card">
+              <div class="card-header">
+                <h5>Upcoming Quiz Competition</h5>
+              </div>
+
+              <div class="quiz-card">
+                <div class="calendar-icon">
+                  <svg
+                    width="60"
+                    height="60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <text
+                      x="12"
+                      y="19"
+                      text-anchor="middle"
+                      font-size="8"
+                      fill="#6610f2"
+                      font-weight="bold"
+                    >
+                      12
+                    </text>
+                  </svg>
+                </div>
+                <div class="calendar-date">12th</div>
+                <div class="calendar-year">Aug, 2023</div>
+
+                <button class="register-btn">Register Now</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="col-lg-4">
+            <!-- Leaderboard -->
+            <div class="card">
+              <div class="card-header">
+                <div class="icon">
+                  <i class="fa-solid fa-crown"></i>
+                </div>
+                <h5>Leader Board</h5>
+              </div>
+
+              <div class="leaderboard-card">
+                <div class="leaderboard-item">
+                  <div class="rank-badge">
+                    <svg viewBox="0 0 24 24" width="40" height="40">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="#fff"
+                        stroke="#FFD700"
+                        stroke-width="1"
+                      />
+                      <text
+                        x="12"
+                        y="16"
+                        text-anchor="middle"
+                        font-size="12"
+                        font-weight="bold"
+                        fill="#FFD700"
+                      >
+                        1
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div class="leaderboard-avatar">
+                    <img src="/api/placeholder/45/45" alt="John" />
+                  </div>
+
+                  <div class="leaderboard-info">
+                    <div class="leaderboard-name">John Leboo</div>
+                    <div class="leaderboard-level">
+                      Neo Programming League_NPL
+                    </div>
+                  </div>
+                </div>
+
+                <div class="leaderboard-item">
+                  <div class="rank-badge">
+                    <svg viewBox="0 0 24 24" width="40" height="40">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="#fff"
+                        stroke="#C0C0C0"
+                        stroke-width="1"
+                      />
+                      <text
+                        x="12"
+                        y="16"
+                        text-anchor="middle"
+                        font-size="12"
+                        font-weight="bold"
+                        fill="#C0C0C0"
+                      >
+                        2
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div class="leaderboard-avatar">
+                    <img src="/api/placeholder/45/45" alt="Samuel" />
+                  </div>
+
+                  <div class="leaderboard-info">
+                    <div class="leaderboard-name">Samuel Kingasunye</div>
+                    <div class="leaderboard-level">
+                      Neo Programming League_NPL
+                    </div>
+                  </div>
+                </div>
+
+                <div class="leaderboard-item">
+                  <div class="rank-badge">
+                    <svg viewBox="0 0 24 24" width="40" height="40">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="#fff"
+                        stroke="#CD7F32"
+                        stroke-width="1"
+                      />
+                      <text
+                        x="12"
+                        y="16"
+                        text-anchor="middle"
+                        font-size="12"
+                        font-weight="bold"
+                        fill="#CD7F32"
+                      >
+                        3
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div class="leaderboard-avatar">
+                    <img src="/api/placeholder/45/45" alt="Stephen" />
+                  </div>
+
+                  <div class="leaderboard-info">
+                    <div class="leaderboard-name">Stephen Kerubo</div>
+                    <div class="leaderboard-level">
+                      Neo Programming League_NPL
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-card-1">
+              <div class="row g-4 text-center">
+                <div class="col-md-4 col-sm-6">
+                  <div class="stat-box">
+                    <h2 class="stat-number">32</h2>
+                    <p class="stat-label">No of Tests</p>
+                  </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                  <div class="stat-box">
+                    <h2 class="stat-number">32</h2>
+                    <p class="stat-label">Tests Written</p>
+                  </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                  <div class="stat-box">
+                    <h2 class="stat-number">12</h2>
+                    <p class="stat-label">Passed</p>
+                  </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                  <div class="stat-box">
+                    <h2 class="stat-number">19</h2>
+                    <p class="stat-label">Failed</p>
+                  </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                  <div class="stat-box">
+                    <h2 class="stat-number">80%</h2>
+                    <p class="stat-label">Overall Average</p>
+                  </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6">
+                  <div class="stat-box">
+                    <h2 class="stat-number">1</h2>
+                    <p class="stat-label">Waiting for result</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
